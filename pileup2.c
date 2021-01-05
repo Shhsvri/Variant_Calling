@@ -41,7 +41,7 @@ static inline void pileup_seq(const bam_pileup1_t *p, int pos, int ref_len, cons
 			else c = bam1_strand(p->b)? tolower(c) : toupper(c);
 		} else {
 			if (c == '=') c = bam1_strand(p->b)? ',' : '.';
-			else c = bam1_strand(p->b)? tolower(c) : toupper(c);
+			else  c = bam1_strand(p->b)? tolower(c) : toupper(c);
 		}
 		putchar(c);
 	} else putchar(p->is_refskip? (bam1_strand(p->b)? '<' : '>') : '*');
@@ -184,8 +184,8 @@ static int mplp_func(void *data, bam1_t *b)
  */
 static int mpileup(mplp_conf_t *conf, int n, char **fn)
 {
-	extern void *bcf_call_add_rg(void *rghash, const char *hdtext, const char *list);
-	extern void bcf_call_del_rghash(void *rghash);
+//	extern void *bcf_call_add_rg(void *rghash, const char *hdtext, const char *list);
+//	extern void bcf_call_del_rghash(void *rghash);
 	mplp_aux_t **data;
 	int i, tid, pos, *n_plp, tid0 = -1, beg0 = 0, end0 = 1u<<29, ref_len, ref_tid = -1, max_depth;
 	const bam_pileup1_t **plp;
@@ -413,7 +413,7 @@ static int mpileup(mplp_conf_t *conf, int n, char **fn)
 	free(data); free(plp); free(ref); free(n_plp);
 	return 0;
 }
-
+/*
 #define MAX_PATH_LEN 1024
 int read_file_list(const char *file_list,int *n,char **argv[])
 {
@@ -470,14 +470,15 @@ int read_file_list(const char *file_list,int *n,char **argv[])
     *n    = nfiles;
     return 0;
 }
-#undef MAX_PATH_LEN
 
+#undef MAX_PATH_LEN
+*/
 int main(int argc, char *argv[])
 {
 	int c;
-    const char *file_list = NULL;
-    char **fn = NULL;
-    int nfiles = 0, use_orphan = 0;
+	const char *file_list = NULL;
+	char **fn = NULL;
+	int nfiles = 0, use_orphan = 0;
 	mplp_conf_t mplp;
 	memset(&mplp, 0, sizeof(mplp_conf_t));
 	mplp.max_mq = 60;
@@ -487,14 +488,14 @@ int main(int argc, char *argv[])
 	mplp.openQ = 40; mplp.extQ = 20; mplp.tandemQ = 100;
 	mplp.min_frac = 0.002; mplp.min_support = 1;
 	mplp.flag = MPLP_NO_ORPHAN | MPLP_REALN;
-    mplp.argc = argc; mplp.argv = argv;
-    static struct option lopts[] = 
+	mplp.argc = argc; mplp.argv = argv;
+	static struct option lopts[] = 
     {
         {"rf",1,0,1},   // require flag
         {"ff",1,0,2},   // filter flag
         {0,0,0,0}
     };
-/*	while ((c = getopt_long(argc, argv, "Agf:r:l:M:q:Q:uaRC:BDSd:L:b:P:po:e:h:Im:F:EG:6OsV1:2:",lopts,NULL)) >= 0) {
+	while ((c = getopt_long(argc, argv, "Agf:r:l:M:q:Q:uaRC:BDSd:L:b:P:po:e:h:Im:F:EG:6OsV1:2:",lopts,NULL)) >= 0) {
 		switch (c) {
 			case  1 : mplp.rflag_require = strtol(optarg,0,0); break;
 			case  2 : mplp.rflag_filter  = strtol(optarg,0,0); break;
@@ -503,8 +504,9 @@ int main(int argc, char *argv[])
 			if (mplp.fai == 0) return 1;
 			mplp.fai_fname = optarg;
 			break;
+			// kell
 			case 'd': mplp.max_depth = atoi(optarg); break;
-			case 'r':*/ mplp.reg = strdup("chr4:141820-141821");/* break;
+			case 'r': mplp.reg = strdup(optarg); break;
 			case 'l': mplp.bed = bed_read(optarg); break;
 			case 'P': mplp.pl_list = strdup(optarg); break;
 			case 'p': mplp.flag |= MPLP_PER_SAMPLE; break;
@@ -534,8 +536,8 @@ int main(int argc, char *argv[])
 			case 'm': mplp.min_support = atoi(optarg); break;
 			case 'L': mplp.max_indel_depth = atoi(optarg); break;
 		}
-	}*/
-	if (mplp.reg) printf("%sNICE\n", mplp.reg);
+	}
+	if (mplp.reg) printf("%s\n", mplp.reg);
 /*	if (use_orphan) mplp.flag &= ~MPLP_NO_ORPHAN;
 	if (argc == 1) {
 		fprintf(stderr, "\n");

@@ -609,7 +609,6 @@ bam_iter_t bam_iter_query(const bam_index_t *idx, int tid, int beg, int end)
 	// initialize iter
 	iter = calloc(1, sizeof(struct __bam_iter_t));
 	iter->tid = tid, iter->beg = beg, iter->end = end; iter->i = -1;
-	//
 	bins = (uint16_t*)calloc(BAM_MAX_BIN, 2);
 	n_bins = reg2bins(beg, end, bins);
 	index = idx->index[tid];

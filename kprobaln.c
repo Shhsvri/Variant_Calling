@@ -1,7 +1,5 @@
 /* The MIT License
-
    Copyright (c) 2003-2006, 2008-2010, by Heng Li <lh3lh3@live.co.uk>
-
    Permission is hereby granted, free of charge, to any person obtaining
    a copy of this software and associated documentation files (the
    "Software"), to deal in the Software without restriction, including
@@ -9,10 +7,8 @@
    distribute, sublicense, and/or sell copies of the Software, and to
    permit persons to whom the Software is furnished to do so, subject to
    the following conditions:
-
    The above copyright notice and this permission notice shall be
    included in all copies or substantial portions of the Software.
-
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -46,7 +42,6 @@ kpa_par_t kpa_par_alt = { 0.0001, 0.01, 10 };
 
 /*
   The topology of the profile HMM:
-
            /\             /\        /\             /\
            I[1]           I[k-1]    I[k]           I[L]
             ^   \      \    ^    \   ^   \      \   ^
@@ -55,14 +50,11 @@ kpa_par_t kpa_par_alt = { 0.0001, 0.01, 10 };
                 \      \/        \/      \/      /
                  \     /\        /\      /\     /
                        -> D[k-1] -> D[k] ->
-
    M[0] points to every {M,I}[k] and every {M,I}[k] points M[L+1].
-
    On input, _ref is the reference sequence and _query is the query
    sequence. Both are sequences of 0/1/2/3/4 where 4 stands for an
    ambiguous residue. iqual is the base quality. c sets the gap open
    probability, gap extension probability and band width.
-
    On output, state and q are arrays of length l_query. The higher 30
    bits give the reference position the query base is matched to and the
    lower two bits can be 0 (an alignment match) or 1 (an
@@ -75,7 +67,7 @@ int kpa_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_quer
 	double **f, **b = 0, *s, m[9], sI, sM, bI, bM, pb;
 	float *qual, *_qual;
 	const uint8_t *ref, *query;
-	int bw, bw2, i, k, is_diff = 0, is_backward = 1, Pr;
+	int bw, bw2, i, k, is_diff, is_backward = 1, Pr;
 
     if ( l_ref<=0 || l_query<=0 ) return 0; // FIXME: this may not be an ideal fix, just prevents sefgault
 

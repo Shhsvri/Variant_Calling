@@ -389,7 +389,7 @@ typedef struct mtaux_t {
 
 static int worker_aux(worker_t *w)
 {
-	int i, tmp, stop = 0;
+	int i,/*tmp,*/ stop = 0;
 	// wait for condition: to process or all done
 	pthread_mutex_lock(&w->mt->lock);
 	while (!w->toproc && !w->mt->done)
@@ -406,7 +406,7 @@ static int worker_aux(worker_t *w)
 		memcpy(w->mt->blk[i], w->buf, clen);
 		w->mt->len[i] = clen;
 	}
-	tmp = __sync_fetch_and_add(&w->mt->proc_cnt, 1);
+//	tmp = __sync_fetch_and_add(&w->mt->proc_cnt, 1);
 	return 0;
 }
 

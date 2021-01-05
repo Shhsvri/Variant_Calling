@@ -263,19 +263,6 @@ faidx_t *fai_load(const char *fn)
 	str = (char*)calloc(strlen(fn) + 5, 1);
 	sprintf(str, "%s.fai", fn);
 
-#ifdef _USE_KNETFILE
-    if (strstr(fn, "ftp://") == fn || strstr(fn, "http://") == fn)
-    {
-        fp = download_and_open(str);
-        if ( !fp )
-        {
-            fprintf(stderr, "[fai_load] failed to open remote FASTA index %s\n", str);
-            free(str);
-            return 0;
-        }
-    }
-    else
-#endif
         fp = fopen(str, "rb");
 	if (fp == 0) {
 		fprintf(stderr, "[fai_load] build FASTA index.\n");

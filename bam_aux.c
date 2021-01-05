@@ -113,7 +113,6 @@ int bam_parse_region(bam_header_t *header, const char *str, int *ref_id, int *be
 
 	bam_init_header_hash(header);
 	h = (khash_t(s)*)header->hash;
-
 	*ref_id = *beg = *end = -1;
 	name_end = l = strlen(str);
 	s = (char*)malloc(l+1);
@@ -141,10 +140,10 @@ int bam_parse_region(bam_header_t *header, const char *str, int *ref_id, int *be
 			} else s[name_end] = ':', name_end = l;
 		}
 	} else iter = kh_get(s, h, str);
-        if (iter == kh_end(h)) {
-          free(s); 
-          return -1;
-        }
+	if (iter == kh_end(h)) {
+	  free(s); 
+	  return -1;
+	}
 	*ref_id = kh_val(h, iter);
 	// parse the interval
 	if (name_end < l) {
@@ -157,6 +156,7 @@ int bam_parse_region(bam_header_t *header, const char *str, int *ref_id, int *be
 		if (*beg > 0) --*beg;
 	} else *beg = 0, *end = 1<<29;
 	free(s);
+	printf("shahin%d,%d,%d\n", *beg, *end, *ref_id);
 	return *beg <= *end? 0 : -1;
 }
 
