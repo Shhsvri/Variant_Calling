@@ -504,7 +504,6 @@ int main(int argc, char *argv[])
 			if (mplp.fai == 0) return 1;
 			mplp.fai_fname = optarg;
 			break;
-			// kell
 			case 'd': mplp.max_depth = atoi(optarg); break;
 			case 'r': mplp.reg = strdup(optarg); break;
 			case 'l': mplp.bed = bed_read(optarg); break;

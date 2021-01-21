@@ -30,18 +30,18 @@ static inline void pileup_seq(const bam_pileup1_t *p, int pos, int ref_len, cons
 		int j;
 		if (p->is_head) {
 			putchar('^');
-	//		putchar(p->b->core.qual > 93? 126 : p->b->core.qual + 33);
+			putchar(p->b->core.qual > 93? 126 : p->b->core.qual + 33);
 		}
 		if (!p->is_del) {
 			int c = bam_nt16_rev_table[bam1_seqi(bam1_seq(p->b), p->qpos)];
-			if (ref) {
-				int rb = pos < ref_len? ref[pos] : 'N';
-				if (c == '=' || bam_nt16_table[c] == bam_nt16_table[rb]) c = bam1_strand(p->b)? ',' : '.';
-				else c = bam1_strand(p->b)? tolower(c) : toupper(c);
-			} else {
-				if (c == '=') c = bam1_strand(p->b)? ',' : '.';
-				else  c = bam1_strand(p->b)? tolower(c) : toupper(c);
-			}
+//			if (ref) {
+//				int rb = pos < ref_len? ref[pos] : 'N';
+//				if (c == '=' || bam_nt16_table[c] == bam_nt16_table[rb]) c = bam1_strand(p->b)? ',' : '.';
+//				else c = bam1_strand(p->b)? tolower(c) : toupper(c);
+//			} else {
+//				if (c == '=') c = bam1_strand(p->b)? ',' : '.';
+//				else  c = bam1_strand(p->b)? tolower(c) : toupper(c);
+//			}
 			putchar(c);
 		} else putchar(p->is_refskip? (bam1_strand(p->b)? '<' : '>') : '*');
 		if (p->indel > 0) {
@@ -62,7 +62,6 @@ static inline void pileup_seq(const bam_pileup1_t *p, int pos, int ref_len, cons
 
 #include <assert.h>
 #include "bam2bcf.h"
-#include "sample.h"
 
 #define MPLP_GLF   0x10
 #define MPLP_NO_COMP 0x20
@@ -117,15 +116,6 @@ static int mplp_func(void *data, bam1_t *b)
 		}
 		if (ma->conf->rflag_require && !(ma->conf->rflag_require&b->core.flag)) { skip = 1; continue; }
 		if (ma->conf->rflag_filter && ma->conf->rflag_filter&b->core.flag) { skip = 1; continue; }
-		if (ma->conf->bed) { // test overlap
-		}
-		if (ma->conf->flag & MPLP_ILLUMINA13) {
-			int i;
-			uint8_t *qual = bam1_qual(b);
-			for (i = 0; i < b->core.l_qseq; ++i)
-				qual[i] = qual[i] > 31? qual[i] - 31 : 0;
-		}
-//		has_ref = (ma->ref && ma->ref_id == b->core.tid)? 1 : 0;
 		skip = 0;
 		if (b->core.qual < ma->conf->min_mq) skip = 1; 
 		else if ((ma->conf->flag&MPLP_NO_ORPHAN) && (b->core.flag&1) && !(b->core.flag&2)) skip = 1;
@@ -207,7 +197,7 @@ static int mpileup(mplp_conf_t *conf, int n, char **fn)
 	max_depth = conf->max_depth;
 	bam_mplp_set_maxcnt(iter, max_depth);
 	while (bam_mplp_auto(iter, &tid, &pos, n_plp, plp) > 0) {
-		if (conf->reg && (pos < beg0-1 || pos >= end0)) continue; // out of the region requested if (tid != ref_tid) {
+		if (conf->reg && (pos < beg0-1 || pos >= end0)) continue;
 		if (tid != ref_tid) {
 			free(ref); ref = 0;
 			for (i = 0; i < n; ++i) data[i]->ref = ref, data[i]->ref_id = tid;
@@ -217,6 +207,7 @@ static int mpileup(mplp_conf_t *conf, int n, char **fn)
 			printf("%s\t%d\t%c", h->target_name[tid], pos + 1, (ref && pos < ref_len)? ref[pos] : 'N');
 			for (i = 0; i < n; ++i) {
 				int j, cnt;
+				// print count of the reads that pass the quality cutoff
 				for (j = cnt = 0; j < n_plp[i]; ++j) {
 					const bam_pileup1_t *p = plp[i] + j;
 					if (bam1_qual(p->b)[p->qpos] >= conf->min_baseQ) ++cnt;
@@ -232,7 +223,8 @@ static int mpileup(mplp_conf_t *conf, int n, char **fn)
 							pileup_seq(plp[i] + j, pos, ref_len, ref);
 					}
 					putchar('\t');
-					printf("%d",n_plp[i]); // shahin
+//					conf->flag |= MPLP_PRINT_MAPQ;
+//					conf->flag |= MPLP_PRINT_POS;
 					for (j = 0; j < n_plp[i]; ++j) {
 						const bam_pileup1_t *p = plp[i] + j;
 						int c = bam1_qual(p->b)[p->qpos];
@@ -291,13 +283,13 @@ int main(int argc, char *argv[])
 //	mplp.flag = MPLP_NO_ORPHAN | MPLP_REALN;
 	mplp.argc = argc; mplp.argv = argv;
 	mplp.reg = strdup("chr4:142958010-142958029");
-	
-	while ((c = getopt(argc, argv, "r:")) >= 0) {
+	while ((c = getopt(argc, argv, "r:q:Q:")) >= 0) {
 		switch (c) {
+			case 'q': mplp.min_mq = atoi(optarg); break;
+			case 'Q': mplp.min_baseQ = atoi(optarg); break;
 			case 'r': mplp.reg = strdup(optarg); break;
 		}
 	}
-	
 	if (mplp.reg) printf("%s\n", mplp.reg);
 	mpileup(&mplp, argc - optind, argv + optind);
 	free(mplp.reg);

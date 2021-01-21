@@ -10,7 +10,7 @@ DFLAGS=		-D_USE_KNETFILE
 
 OBJS=	bedidx.o bam_aux.o  kstring.o bgzf.o  bam_import.o faidx.o \
 		bam_index.o razf.o sam_header.o knetfile.o bam.o sam.o \
-		bam_pileup.o bam_plcmd.o sample.o
+		bam_pileup.o bam_plcmd.o
 
 
 .SUFFIXES:.c .o
